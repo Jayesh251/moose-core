@@ -85,7 +85,7 @@ jobs:
               brew uninstall pkg-config@0.29.2 || :
                 brew install gsl hdf5 meson ninja cmake &&
             export PKG_CONFIG=`which pkg-config` &&
-            echo "<<<<<<<<<#########################################>>>>>>>>>>" &&
+            echo "<<<<<<<<<##########################################>>>>>>>>>>" &&
             echo "$$$$$ `pkg-config --libs gsl`" &&
             echo "@@@@@ `pkg-config --cflags gsl`"
           CIBW_ARCHS: 'arm64'
