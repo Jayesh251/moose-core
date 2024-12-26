@@ -24,8 +24,8 @@ jobs:
       - name: MacOS dpendencies
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew uninstall pkg-config || echo "pkg-config not installed, skipping uninstall."
-          brew uninstall pkg-config@0.29.2 || echo "pkg-config@0.29.2 not available, skipping uninstall."
+          brew uninstall pkg-config || echo "pkg-config not installed, skipping uninstallation."
+          brew uninstall pkg-config@0.29.2 || echo "pkg-config@0.29.2 not available, skipping uninstallation."
           brew install gsl
           brew install hdf5          
       - name: Windows dependencies
