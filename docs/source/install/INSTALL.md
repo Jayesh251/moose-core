@@ -75,6 +75,23 @@ This wheel is built for:
     ```
     
 
+## Installing with Docker (MOOSE + JARDesigner)
+
+If you don't want to install Python, GSL, HDF5, or any other dependency
+yourself, a Docker image is available that bundles MOOSE, JupyterLab, and
+JARDesigner (the model-building web GUI) together, ready to run on Windows,
+macOS, or Linux:
+
+```
+docker run -d --name moose-jardesigner -p 8888:8888 -p 5000:5000 \
+  -v moose_workspace:/workspace \
+  -v jardesigner_data:/root/.local/share/jardesigner \
+  jayesh8050/moose-jardesigner:latest
+```
+
+For installing Docker itself, an explanation of what this command does, and
+troubleshooting, see [Docker.md](Docker.md).
+
 ## Installing from source code in GitHub repository
 
 To build MOOSE from source, you need build tools and development libraries. We recommend Python 3.9 or higher.
