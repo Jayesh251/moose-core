@@ -35,6 +35,17 @@ details about MOOSE simulator, visit https://moose.ncbs.res.in .
 
 ---
 
+# What's New
+
+- **Docker-based installation**: MOOSE, JupyterLab, and JARDesigner (the
+  web-based model-building GUI) are now available as a single, self-contained
+  Docker image — no Python setup required, and it runs identically on
+  Windows, macOS, and Linux. See
+  [moose-jardesigner-docker](https://github.com/MooseNeuro/moose-jardesigner-docker)
+  to get started.
+
+---
+
 # Installation
 
 See [docs/source/install/INSTALL.md](docs/source/install/INSTALL.md) for instructions on installation.
