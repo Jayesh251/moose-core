@@ -209,6 +209,14 @@ endif
 # GSL is required
 gsl_dep = dependency('gsl', version: '>=1.16')
 
+if host_machine.system() == 'darwin'
+  # libgsl leaves its cblas_* symbols to be provided by libgslcblas, but
+  # _moose calls no cblas_* itself, so meson's as-needed linking dropped
+  # libgslcblas and the macOS wheels shipped without it ('import moose'
+  # failed with "symbol not found in flat namespace '_cblas_caxpy'").
+  link_args += ['-Wl,-needed-lgslcblas']
+endif
+
 
 # libsoda = static_library('lsoda', 'external/libsoda/LSODA.cpp',
 #                           include_directories: 'external/libsoda',
