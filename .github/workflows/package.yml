@@ -57,6 +57,7 @@ jobs:
             ninja
             meson-python
             gsl
+            libblas=*=*openblas
             cibuildwheel
           post-cleanup: all
           generate-run-shell: false            

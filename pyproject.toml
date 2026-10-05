@@ -128,6 +128,15 @@ manylinux-pypy_aarch64-image = 'manylinux2014'
 repair-wheel-command = 'delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}'
 
 [tool.cibuildwheel.windows]
+# Bundle the GSL and HDF5 DLLs from the micromamba build environment into
+# the wheel, as auditwheel and delocate do on Linux and macOS. Without this
+# step _moose.pyd fails to load with "DLL load failed" on any machine that
+# does not happen to have those DLLs installed (all pymoose 5.0.0 Windows
+# wheels). conda-forge's libcblas.dll only forwards its exports to the BLAS
+# implementation, which delvewheel cannot follow, so openblas.dll is
+# included explicitly (package.yml selects the OpenBLAS variant).
+before-build = 'pip install delvewheel'
+repair-wheel-command = 'delvewheel repair --add-path "%CONDA_PREFIX%\Library\bin" --include openblas.dll -w {dest_dir} {wheel}'
 
 [tool.black]
 line-length = 80
