@@ -211,10 +211,15 @@ gsl_dep = dependency('gsl', version: '>=1.16')
 
 if host_machine.system() == 'darwin'
   # libgsl leaves its cblas_* symbols to be provided by libgslcblas, but
-  # _moose calls no cblas_* itself, so meson's as-needed linking dropped
-  # libgslcblas and the macOS wheels shipped without it ('import moose'
-  # failed with "symbol not found in flat namespace '_cblas_caxpy'").
-  link_args += ['-Wl,-needed-lgslcblas']
+  # _moose calls no cblas_* itself, so as-needed linking (-dead_strip_dylibs)
+  # dropped libgslcblas and the macOS wheels shipped without it ('import
+  # moose' failed with "symbol not found in flat namespace '_cblas_caxpy'").
+  # Meson hands GSL to the linker by full path, so mark it needed by path.
+  fs = import('fs')
+  gslcblas_path = gsl_dep.get_variable(pkgconfig: 'libdir', default_value: '') / 'libgslcblas.dylib'
+  if fs.exists(gslcblas_path)
+    link_args += ['-Wl,-needed_library,' + gslcblas_path]
+  endif
 endif
 
 
