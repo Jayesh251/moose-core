@@ -4,6 +4,18 @@
 ## Unreleased
 *Unreleased changes go here*
 
+## [5.0.1] - 2026-10-06
+
+Mysore Pak
+
+### Bug Fixes
+- Fixed `import moose` failing on Windows with "DLL load failed" when
+  installed with pip outside a conda environment; the Windows wheels now
+  bundle the GSL and HDF5 libraries they need
+- Fixed `import moose` failing on macOS under a conda Python with
+  "symbol not found in flat namespace '_cblas_caxpy'"; the macOS wheels
+  now bundle the CBLAS library they need
+
 ## [5.0.0] - 2026-09-30
 
 Mysore Pak

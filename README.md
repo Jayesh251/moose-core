@@ -46,7 +46,7 @@ https://github.com/MooseNeuro/moose-examples.
 - A set of jupyter notebooks with step by step examples with explanation are available here:
 https://github.com/MooseNeuro/moose-notebooks.
 
-# v5.0.0 – Major Release "Mysore Pak"
+# v5.0.1 – Incremental Release over v5.0.0 "Mysore Pak"
 
 [`Mysore Pak`](https://en.wikipedia.org/wiki/Mysore_pak) is a rich,
 ghee-based sweet that originated in the kitchens of the Mysore Palace in
@@ -101,6 +101,16 @@ Now you can import moose in a Python script or interpreter with the statement:
 ```
 >>> import moose
 ```
+
+## Updates in 5.0.1
+
+### Bug Fixes
+- Fixed `import moose` failing on Windows with "DLL load failed" when
+  installed with pip outside a conda environment; the Windows wheels now
+  bundle the GSL and HDF5 libraries they need
+- Fixed `import moose` failing on macOS under a conda Python with
+  "symbol not found in flat namespace '_cblas_caxpy'"; the macOS wheels
+  now bundle the CBLAS library they need
 
 ## What's New in 5.0.0
 
