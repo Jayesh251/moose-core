@@ -104,7 +104,7 @@ jobs:
         env:
           CIBW_BEFORE_ALL: 'uname -a'
           CIBW_BUILD: '*-win_*'
-          CIBW_SKIP: '*-win32 pp* *t-*'
+          CIBW_SKIP: '*-win32 pp* *t-* cp315-*'
         run: |
           micromamba shell hook -s powershell | Out-String | Invoke-Expression
           micromamba activate moose
