@@ -98,7 +98,7 @@ before-all = 'uname -a'
 before-build = ''
 repair-wheel-command = ''
 
-test-command = ''
+test-command = "python -c \"import moose; moose.Compartment('/c')\""
 before-test = ''
 test-requires = []
 test-extras = []

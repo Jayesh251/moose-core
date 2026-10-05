@@ -110,6 +110,11 @@ jobs:
           micromamba activate moose
           python -m cibuildwheel --output-dir wheelhouse
           dir wheelhouse
+      - name: Keep wheels for testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: wheelhouse/*.whl
       - name: Upload packages
         if: github.ref == 'refs/heads/master'
         uses: xresloader/upload-to-github-release@v1
@@ -132,3 +137,34 @@ jobs:
 #          which python  # Debug: Ensure Python is available
 #         which twine  # Debug: Check if Twine is correctly installed
 #          python -m twine upload wheelhouse/*.whl  # Upload the built wheels to PyPI
+
+  test_wheel_conda:
+    # cibuildwheel's test-command imports with a python.org Python. The
+    # 5.0.0 macOS wheels passed that but failed to import under a conda
+    # Python, so also test the built wheels there.
+    needs: build_wheel
+    name: test conda / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14, macos-15, windows-latest]
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: wheelhouse
+          merge-multiple: true
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: '3.12'
+          channels: conda-forge
+          conda-remove-defaults: 'true'
+      - name: Install the built wheel and import it
+        run: |
+          python -m pip install --no-index --find-links wheelhouse --no-deps pymoose
+          python -m pip install pymoose --find-links wheelhouse
+          python -c "import moose; moose.Compartment('/c'); print('moose', moose.__version__)"
