@@ -41,7 +41,7 @@ jobs:
           if [ "${{ matrix.env }}" = conda ]; then conda activate moose; fi
           python --version
           python -m pip install pymoose
-          python -m pip show pymoose | head -2
+          python -m pip show pymoose | grep -E "^(Name|Version):"
 
       - name: Checks
         run: |
