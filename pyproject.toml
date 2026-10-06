@@ -126,6 +126,9 @@ manylinux-pypy_aarch64-image = 'manylinux2014'
 
 [tool.cibuildwheel.macos]
 repair-wheel-command = 'delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}'
+# 'tables', a dependency, has no Python 3.9 wheel, so the test environment
+# compiles it from source, which fails with the macOS 15 SDK.
+test-skip = "cp39-*"
 
 [tool.cibuildwheel.windows]
 # Bundle the GSL and HDF5 DLLs from the micromamba build environment into
