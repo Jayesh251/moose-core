@@ -1,0 +1,93 @@
+name: Guide check
+
+# Follows the MOOSE installation guide step by step on every platform, with
+# the released pymoose from PyPI, and reports what works.
+on:
+  push:
+    branches: [ci/guide-test]
+  workflow_dispatch:
+
+jobs:
+  guide:
+    name: ${{ matrix.env }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14, macos-15, windows-latest]
+        env: [conda, pip]
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - if: matrix.env == 'conda'
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          auto-activate-base: false
+
+      - if: matrix.env == 'pip'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Guide step 1, create the environment
+        if: matrix.env == 'conda'
+        run: conda create -y -n moose python=3.13 gsl hdf5 numpy vpython matplotlib -c conda-forge
+
+      - name: Guide steps 2 and 3, activate and install pymoose
+        run: |
+          if [ "${{ matrix.env }}" = conda ]; then conda activate moose; fi
+          python --version
+          python -m pip install pymoose
+          python -m pip show pymoose | head -2
+
+      - name: Checks
+        run: |
+          if [ "${{ matrix.env }}" = conda ]; then conda activate moose; fi
+
+          echo "::group::A. bare import (nothing imported first)"
+          if python -c "import moose; print('moose', moose.__version__)"; then A=ok; else A=FAILED; fi
+          echo "::endgroup::"
+
+          echo "::group::B1. guide verification command 1"
+          if python -c "import numpy; import moose; print(moose.__version__)"; then B1=ok; else B1=FAILED; fi
+          echo "::endgroup::"
+
+          echo "::group::B2. guide verification command 2"
+          if python -c "import numpy; import moose; ch = moose.HHChannel('ch'); moose.le()"; then B2=ok; else B2=FAILED; fi
+          echo "::endgroup::"
+
+          echo "::group::C. numpy first, then a small simulation"
+          cat > sim.py <<'EOF'
+          import numpy
+          import moose
+          c = moose.Compartment('/c')
+          c.Rm, c.Cm, c.Em, c.initVm, c.inject = 1e8, 1e-10, -0.065, -0.065, 1e-10
+          t = moose.Table('/t')
+          moose.connect(t, 'requestOut', c, 'getVm')
+          moose.reinit()
+          moose.start(0.05)
+          v = t.vector
+          assert len(v) > 10 and v[-1] > v[0], (len(v), v[0], v[-1])
+          print('simulation OK: Vm', round(v[0], 4), '->', round(v[-1], 4))
+          EOF
+          if python sim.py; then C=ok; else C=FAILED; fi
+          echo "::endgroup::"
+
+          {
+            echo "### ${{ matrix.env }} / ${{ matrix.os }}"
+            echo "| check | result |"
+            echo "|---|---|"
+            echo "| A. bare import moose | $A |"
+            echo "| B1. guide verification command 1 | $B1 |"
+            echo "| B2. guide verification command 2 | $B2 |"
+            echo "| C. numpy first, then a simulation | $C |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "A=$A B1=$B1 B2=$B2 C=$C"
+
+          # The guide's own commands must pass in the conda environment it describes.
+          if [ "${{ matrix.env }}" = conda ] && { [ "$B1" != ok ] || [ "$B2" != ok ] || [ "$C" != ok ]; }; then
+            exit 1
+          fi
